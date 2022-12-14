@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+
 @pytest.fixture(scope="session")
 def abspath_to_tests():
     """
