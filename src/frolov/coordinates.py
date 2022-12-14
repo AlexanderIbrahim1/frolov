@@ -49,6 +49,31 @@ class PerimetricCoordinate:
     def unpack(self) -> Tuple[float, ...]:
         return (self.u1, self.u2, self.u3, self.t3, self.s3, self.w3)
 
+    def satisfies_inequalities(self) -> bool:
+        """Check if all the constraints put on the perimetric coordinates are satisfied."""
+        return (
+            self.satisfies_s3_inequality()
+            and self.satisfies_w3_inequality()
+            and self.are_all_positive()
+        )
+
+    def satisfies_s3_inequality(self) -> bool:
+        """Check if 's3' satisfies the inequality in equation (32) of the paper."""
+        lower_limit = max(0.0, self.u3 - self.t3)
+        upper_limit = self.u2 + self.u3
+
+        return lower_limit <= self.s3 <= upper_limit
+
+    def satisfies_w3_inequality(self) -> bool:
+        """Check if 'w3' satisfies the inequality in equation (32) of the paper."""
+        lower_limit = max(0.0, self.u3 - self.t3, self.s3 - self.u2)
+        upper_limit = min(self.u1 + self.u3, self.u1 + self.s3)
+
+        return lower_limit <= self.w3 <= upper_limit
+
+    def are_all_positive(self) -> bool:
+        return all([peri >= 0.0 for peri in self.unpack()])
+
 
 def cartesian_to_pairdistance(points: CartesianCoordinate) -> PairDistanceCoordinate:
     """Calculate the 6 relative pair distances from the 4 Cartesian points."""
