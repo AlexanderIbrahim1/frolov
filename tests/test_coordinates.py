@@ -8,8 +8,17 @@ from cartesian import Cartesian3D
 from cartesian.measure import euclidean_distance as distance
 
 from frolov.coordinates import CartesianCoordinate
+from frolov.coordinates import PairDistanceCoordinate
 from frolov.coordinates import cartesian_to_pairdistance
 from frolov.coordinates import pairdistance_to_perimetric
+from frolov.coordinates import perimetric_to_pairdistance
+
+
+def distance_squared_between_pairdists(
+    pd0: PairDistanceCoordinate,
+    pd1: PairDistanceCoordinate,
+) -> float:
+    return sum([(r0 - r1)**2 for (r0, r1) in zip(pd0.unpack(), pd1.unpack())])
 
 
 def tetrahedron_points(sidelen: float) -> CartesianCoordinate:
@@ -117,3 +126,26 @@ def test_inequality_satisfaction():
         perimetrics = pairdistance_to_perimetric(pairdists)
 
         assert perimetrics.satisfies_inequalities()
+
+
+def test_pairdistance_to_perimetric_and_back():
+    """
+    One way to check if the 'perimetric_to_pairdistance' function works is to
+    check if the transformation between the two coordinates is bijective.
+    """
+    tolerance = 1.0e-6
+    cube_sidelen = 1.0
+
+    n_attempts = 1000
+    for _ in range(n_attempts):
+        p0 = random_point_in_positive_octant_box(cube_sidelen)
+        p1 = random_point_in_positive_octant_box(cube_sidelen)
+        p2 = random_point_in_positive_octant_box(cube_sidelen)
+        p3 = random_point_in_positive_octant_box(cube_sidelen)
+
+        cartesians = CartesianCoordinate(p0, p1, p2, p3)
+        pairdists = cartesian_to_pairdistance(cartesians)
+        perimetrics = pairdistance_to_perimetric(pairdists)
+        pairdists_again = perimetric_to_pairdistance(perimetrics)
+
+        assert distance_squared_between_pairdists(pairdists, pairdists_again) < tolerance
