@@ -1,7 +1,7 @@
 """
 Calculate the six perimetric coordinates from 4 points in 3D Cartesian space.
 
-We refer to the points (u1, u2, u3, s3, t3, w3) given in the paper.
+We refer to the coordinates (u1, u2, u3, s3, t3, w3) given in the paper.
 """
 
 from __future__ import annotations
