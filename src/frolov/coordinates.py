@@ -92,7 +92,11 @@ def cartesian_to_pairdistance(points: CartesianCoordinate) -> PairDistanceCoordi
 def pairdistance_to_perimetric(
     pairdists: PairDistanceCoordinate,
 ) -> PerimetricCoordinate:
-    """Calculate the 6 perimetric coordinates from the 6 relative pair distances."""
+    """
+    Calculate the 6 perimetric coordinates from the 6 relative pair distances.
+
+    These conversions are taken directly from equation (24) in the paper.
+    """
     r01, r02, r03, r12, r13, r23 = pairdists.unpack()
 
     u1 = 0.5 * (r02 + r01 - r12)
@@ -103,3 +107,24 @@ def pairdistance_to_perimetric(
     w3 = 0.5 * (r23 + r02 - r03)
 
     return PerimetricCoordinate(u1, u2, u3, t3, s3, w3)
+
+
+def perimetric_to_pairdistance(
+    perimetric: PerimetricCoordinate,
+) -> PairDistanceCoordinate:
+    """
+    Calculate the 6 relative pair distance coordinates from the 6 perimetric
+    coordinates.
+    
+    These conversions are taken directly from equation (25) in the paper.
+    """
+    u1, u2, u3, t3, s3, w3 = perimetric.unpack()
+    
+    r12 = u1 + u2
+    r13 = u1 + u3
+    r14 = u1 + s3 + t3 - w3
+    r23 = u2 + u3
+    r24 = u2 + w3 + t3 - s3
+    r34 = t3 + w3 + s3 - u3
+
+    return PairDistanceCoordinate(r12, r13, r14, r23, r24, r34)
