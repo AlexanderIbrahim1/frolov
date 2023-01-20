@@ -6,6 +6,7 @@ We refer to the coordinates (u1, u2, u3, s3, t3, w3) given in the paper.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Tuple
 
@@ -128,3 +129,51 @@ def perimetric_to_pairdistance(
     r34 = t3 + w3 + s3 - u3
 
     return PairDistanceCoordinate(r12, r13, r14, r23, r24, r34)
+
+
+def pairdistance_to_cartesian(pairdists: PairDistanceCoordinate) -> CartesianCoordinate:
+    """
+    This function uses the 6 relative pair distances between the four points to
+    recover four Cartesian points in 3D space.
+
+    The four points returned satisfy the following properties:
+     - point0 is at the origin
+     - point1 lies on the positive x-axis
+     - point2 satisfies (y >= 0, z == 0)
+     - point3 satisfies (x >= 0, y >= 0, z >= 0)
+
+    The 'pairdistance_to_cartesian()' and the 'cartesian_to_pairdistance()' functions
+    are not inverses. We lose information when using the 'cartesian_to_pairdistance()'
+    transformation. The relative pair distances only have 6 degrees of freedom (DOF) of
+    information to work with, but the four Cartesian points have 12 DOF.
+
+    The three DOF describing the centre of mass position of the four-body system are
+    lost when converting from relative pair distances to Cartesian coordinates. The
+    three DOF describing the orientation in space of the four-body system are also lost.
+    """
+    r01, r02, r03, r12, r13, r23 = pairdists.unpack()
+
+    cos_theta102 = (r01**2 + r02**2 - r12**2) / (2.0 * r01 * r02)
+
+    x2 = r02 * cos_theta102
+    y2 = math.sqrt(r02**2 - x2**2)
+    z2 = 0.0
+
+    x3 = (r03**2 - r13**2 + r01**2) / (2.0 * r01)
+    y3 = (r03**2 - r23**2 + r02**2 - 2.0 * x2 * x3) / (2.0 * y2)
+    z3 = math.sqrt(r03**2 - x3**2 - y3**2)
+
+    point0 = Cartesian3D(0.0, 0.0, 0.0)
+    point1 = Cartesian3D(r01, 0.0, 0.0)
+    point2 = Cartesian3D(x2, y2, z2)
+    point3 = Cartesian3D(x3, y3, z3)
+
+    return CartesianCoordinate(point0, point1, point2, point3)
+
+
+
+
+
+
+
+

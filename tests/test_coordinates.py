@@ -10,6 +10,7 @@ from cartesian.measure import euclidean_distance as distance
 from frolov.coordinates import CartesianCoordinate
 from frolov.coordinates import PairDistanceCoordinate
 from frolov.coordinates import cartesian_to_pairdistance
+from frolov.coordinates import pairdistance_to_cartesian
 from frolov.coordinates import pairdistance_to_perimetric
 from frolov.coordinates import perimetric_to_pairdistance
 
@@ -149,3 +150,30 @@ def test_pairdistance_to_perimetric_and_back():
         pairdists_again = perimetric_to_pairdistance(perimetrics)
 
         assert distance_squared_between_pairdists(pairdists, pairdists_again) < tolerance
+
+
+def test_cartesian_to_pairdistance_and_back():
+    """
+    NOTE: The first time a 4 points in Cartesian3D space are reduced to their relative
+    pair distances, information about the system's position and overall orientation in
+    space is lost. However, the subsequent transformations back and forth between the
+    CartesianCoordinate and PairDistanceCoordinate instances should maintain all the
+    relevant information.
+    """
+
+    tolerance = 1.0e-6
+    cube_sidelen = 1.0
+
+    n_attempts = 1000
+    for _ in range(n_attempts):
+        p0 = random_point_in_positive_octant_box(cube_sidelen)
+        p1 = random_point_in_positive_octant_box(cube_sidelen)
+        p2 = random_point_in_positive_octant_box(cube_sidelen)
+        p3 = random_point_in_positive_octant_box(cube_sidelen)
+
+        cartesians = CartesianCoordinate(p0, p1, p2, p3)
+        original_pairdists = cartesian_to_pairdistance(cartesians)
+        new_cartesians = pairdistance_to_cartesian(original_pairdists)
+        recovered_pairdists = cartesian_to_pairdistance(new_cartesians)
+
+        assert distance_squared_between_pairdists(original_pairdists, recovered_pairdists) < tolerance
