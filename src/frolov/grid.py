@@ -6,6 +6,10 @@ own axis.
 There are six different ways to structure the constraints on the perimetric
 coordinates. We have chosen the way used in the limits of equation (37) in
 the paper.
+
+However, we have rearranged the order in which the coordinates are set. The
+original way of arranging the limits would cause 'grid_s3' to be undefined
+in the case where u2 == u3.
 """
 
 from dataclasses import dataclass
@@ -49,25 +53,41 @@ class GridCoordinate:
                 self.grid_u2 >= 0,
                 self.grid_u3 >= 1,
                 self.grid_t3 >= 1,
-                1 >= self.grid_s3 >= 0,
+                self.grid_s3 >= 1,
                 1 >= self.grid_w3 >= 0,
             ]
         )
 
 
-def grid_to_perimetric(
-    gridcoord: GridCoordinate,
-) -> PerimetricCoordinate:
-    """
-    Perform the transformations that turn a grid coordinate into a perimetric
-    coordinate.
-    """
+def grid_to_perimetric(gridcoord: GridCoordinate)-> PerimetricCoordinate:
+    """Perform the transformations that turn a grid coordinate into a perimetric coordinate."""
+    grid_u1, grid_u2, grid_u3, grid_t3, grid_s3, grid_w3 = gridcoord.unpack()
 
-    u1 = gridcoord.grid_u1
-    u2 = gridcoord.grid_u2
-    u3 = gridcoord.grid_u3 * u2
-    t3 = gridcoord.grid_t3 * u3
-    s3 = gridcoord.grid_s3 * (u3 - u2) + u2
-    w3 = gridcoord.grid_w3 * (u1 + u2) + (s3 - u2)
+    u1 = grid_u1
+    u2 = grid_u2
+    s3 = grid_s3 * u2
+    u3 = grid_u3 * s3
+    t3 = grid_t3 * u3
+    w3 = grid_w3 * (u1 + u2) + (s3 - u2)
 
     return PerimetricCoordinate(u1, u2, u3, t3, s3, w3)
+
+
+def perimetric_to_grid(perimetric: PerimetricCoordinate) -> GridCoordinate:
+    """Perform the inverse transformations of 'grid_to_perimetric()' """
+    u1, u2, u3, t3, s3, w3 = perimetric.unpack()
+
+    grid_u1 = u1
+    grid_u2 = u2
+    grid_s3 = s3 / u2
+    grid_u3 = u3 / s3
+    grid_t3 = t3 / u3
+    grid_w3 = (w3 - s3 + u2) / (u1 + u2)
+
+    return GridCoordinate(grid_u1, grid_u2, grid_u3, grid_t3, grid_s3, grid_w3)
+
+
+
+
+
+
