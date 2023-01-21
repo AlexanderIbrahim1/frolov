@@ -1,11 +1,16 @@
 """
-Create a grid from which the six coordinates (u1, u2, u3, s3, t3, w3) can be
-generated. Each parameter in the grid can be independently varied along its
-own axis.
+The six values that make up a PerimetricCoordinate instance cannot be varied
+completely independently from each other. There are restrictions and inequalities
+between them that must be satisfied.
+
+The GridCoordinate instance is a rescaled version of the PerimetricCoordinate
+instance, in which all six coordinates (grid_u1, ..., grid_w3) can be varied
+completely independently of one another. This is a very useful property to have
+when sampling from the coordinate space.
 
 There are six different ways to structure the constraints on the perimetric
 coordinates. We have chosen the way used in the limits of equation (37) in
-the paper.
+the paper (also named b.1.2 by the author).
 
 However, we have rearranged the order in which the coordinates are set. The
 original way of arranging the limits would cause 'grid_s3' to be undefined
@@ -58,10 +63,12 @@ def grid_distance_squared(c0: GridCoordinate, c1: GridCoordinate) -> float:
     It is important to note that this function makes the (possibly) unsubstantiated
     assumption that all 6 grid coordinate elements should all be weighted equally.
     """
-    return sum([(q0 - q1)**2 for (q0, q1) in zip(c0.unpack(), c1.unpack())])
+    return sum([(q0 - q1) ** 2 for (q0, q1) in zip(c0.unpack(), c1.unpack())])
 
 
-def grid_approx_eq(c0: GridCoordinate, c1: GridCoordinate, eps_sq: float = 1.0e-6) -> bool:
+def grid_approx_eq(
+    c0: GridCoordinate, c1: GridCoordinate, eps_sq: float = 1.0e-6
+) -> bool:
     """
     Checks if two coordinate instances are close enough to be essentially equal.
     """

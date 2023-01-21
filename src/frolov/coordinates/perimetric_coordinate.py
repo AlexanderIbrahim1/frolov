@@ -13,7 +13,7 @@ class PerimetricCoordinate:
     s3: float
     w3: float
 
-    def __postinit__(self) -> None:
+    def __post_init__(self) -> None:
         assert self._satisfies_s3_inequality()
         assert self._satisfies_w3_inequality()
         assert self._are_all_nonnegative()
@@ -40,17 +40,21 @@ class PerimetricCoordinate:
         return all([peri >= 0.0 for peri in self.unpack()])
 
 
-def perimetric_distance_squared(c0: PerimetricCoordinate, c1: PerimetricCoordinate) -> float:
+def perimetric_distance_squared(
+    c0: PerimetricCoordinate, c1: PerimetricCoordinate
+) -> float:
     """
     Calculating the sum of the squared differences between each coordinate.
 
     It is important to note that this function makes the (possibly) unsubstantiated
     assumption that all 6 coordinate elements should all be weighted equally.
     """
-    return sum([(q0 - q1)**2 for (q0, q1) in zip(c0.unpack(), c1.unpack())])
+    return sum([(q0 - q1) ** 2 for (q0, q1) in zip(c0.unpack(), c1.unpack())])
 
 
-def perimetric_approx_eq(c0: PerimetricCoordinate, c1: PerimetricCoordinate, eps_sq: float = 1.0e-6) -> bool:
+def perimetric_approx_eq(
+    c0: PerimetricCoordinate, c1: PerimetricCoordinate, eps_sq: float = 1.0e-6
+) -> bool:
     """
     Checks if two coordinate instances are close enough to be essentially equal.
     """
