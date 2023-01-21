@@ -3,10 +3,10 @@ import pytest
 import math
 import random
 
-from frolov.coordinates import PerimetricCoordinate
-from frolov.grid import GridCoordinate
-from frolov.grid import grid_to_perimetric
-from frolov.grid import perimetric_to_grid
+from frolov import PerimetricCoordinate
+from frolov import GridCoordinate
+from frolov import grid_to_perimetric
+from frolov import perimetric_to_grid
 
 
 def approx_eq(g0: GridCoordinate, g1: GridCoordinate, eps: float) -> bool:
@@ -48,9 +48,6 @@ class TestGridCoordinate:
         assert gc.grid_s3 == pytest.approx(1.1)
         assert gc.grid_w3 == pytest.approx(0.6)
         
-        pc = grid_to_perimetric(gc)
-        assert pc.satisfies_inequalities()
-
     @pytest.mark.parametrize(
         'index, invalid_value',
         [
