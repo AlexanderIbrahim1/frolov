@@ -32,7 +32,7 @@ def pairdistance_to_cartesian(pairdists: PairDistanceCoordinate) -> CartesianCoo
      - point0 is at the origin
      - point1 lies on the positive x-axis
      - point2 satisfies (y >= 0, z == 0)
-     - point3 satisfies (x >= 0, y >= 0, z >= 0)
+     - point3 satisfies (z >= 0)
 
     The 'pairdistance_to_cartesian()' and the 'cartesian_to_pairdistance()' functions
     are not inverses. We lose information when using the 'cartesian_to_pairdistance()'
