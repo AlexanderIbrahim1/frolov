@@ -40,18 +40,18 @@ class PerimetricCoordinate:
         return all([peri >= 0.0 for peri in self.unpack()])
 
 
-def distance_squared(p0: PerimetricCoordinate, p1: PerimetricCoordinate) -> float:
+def perimetric_distance_squared(c0: PerimetricCoordinate, c1: PerimetricCoordinate) -> float:
     """
-    Calculating the mean of the squared differences between each coordinate.
+    Calculating the sum of the squared differences between each coordinate.
 
     It is important to note that this function makes the (possibly) unsubstantiated
-    assumption that all 6 perimetric coordinates should all be weighted equally.
+    assumption that all 6 coordinate elements should all be weighted equally.
     """
-    return sum([(c0 - c1)**2 for (c0, c1) in zip(p0.unpack(), p1.unpack())])
+    return sum([(q0 - q1)**2 for (q0, q1) in zip(c0.unpack(), c1.unpack())])
 
 
-def approx_eq(p0: PerimetricCoordinate, p1: PerimetricCoordinate, eps_sq: float = 1.0e-6) -> bool:
+def perimetric_approx_eq(c0: PerimetricCoordinate, c1: PerimetricCoordinate, eps_sq: float = 1.0e-6) -> bool:
     """
-    Checks if two PerimetricCoordinate instances are close enough to be essentially equal.
+    Checks if two coordinate instances are close enough to be essentially equal.
     """
-    return distance_squared(p0, p1) < eps_sq
+    return perimetric_distance_squared(c0, c1) < eps_sq

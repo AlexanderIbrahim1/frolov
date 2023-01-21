@@ -24,18 +24,15 @@ class PairDistanceCoordinate:
         return all([pairdist >= 0.0 for pairdist in self.unpack()])
 
 
-def pairdistance_distance_squared(p0: GridCoordinate, p1: GridCoordinate) -> float:
+def pairdistance_distance_squared(c0: PairDistanceCoordinate, c1: PairDistanceCoordinate) -> float:
     """
-    Calculating the mean of the squared differences between each coordinate.
-
-    It is important to note that this function makes the (possibly) unsubstantiated
-    assumption that all 6 grid coordinate elements should all be weighted equally.
+    Calculating the sum of the squared differences between each coordinate.
     """
-    return sum([(c0 - c1)**2 for (c0, c1) in zip(p0.unpack(), p1.unpack())])
+    return sum([(q0 - q1)**2 for (q0, q1) in zip(c0.unpack(), c1.unpack())])
 
 
-def pairdistance_approx_eq(p0: GridCoordinate, p1: GridCoordinate, eps_sq: float = 1.0e-6) -> bool:
+def pairdistance_approx_eq(c0: PairDistanceCoordinate, c1: PairDistanceCoordinate, eps_sq: float = 1.0e-6) -> bool:
     """
     Checks if two coordinate instances are close enough to be essentially equal.
     """
-    return grid_distance_squared(p0, p1) < eps_sq
+    return pairdistance_distance_squared(c0, c1) < eps_sq
