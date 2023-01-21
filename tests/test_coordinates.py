@@ -7,12 +7,14 @@ import random
 from cartesian import Cartesian3D
 from cartesian.measure import euclidean_distance as distance
 
-from frolov.coordinates import CartesianCoordinate
-from frolov.coordinates import PairDistanceCoordinate
-from frolov.coordinates import cartesian_to_pairdistance
-from frolov.coordinates import pairdistance_to_cartesian
-from frolov.coordinates import pairdistance_to_perimetric
-from frolov.coordinates import perimetric_to_pairdistance
+from frolov.coordinates import perimetric_coordinate
+
+from frolov import CartesianCoordinate
+from frolov import PairDistanceCoordinate
+from frolov import cartesian_to_pairdistance
+from frolov import pairdistance_to_cartesian
+from frolov import pairdistance_to_perimetric
+from frolov import perimetric_to_pairdistance
 
 
 def distance_squared_between_pairdists(
@@ -74,8 +76,6 @@ def test_tetrahedron(sidelen):
     for peri_coord in perimetrics.unpack():
         assert peri_coord == pytest.approx(sidelen / 2.0)
 
-    assert perimetrics.satisfies_inequalities()
-
 
 def test_square():
     """
@@ -100,15 +100,15 @@ def test_square():
     assert perimetrics.t3 == pytest.approx(sidelen / math.sqrt(2.0))
     assert perimetrics.s3 == pytest.approx(sidelen * (1.0 - math.sqrt(0.5)))
     assert perimetrics.w3 == pytest.approx(sidelen / math.sqrt(2.0))
-    assert perimetrics.satisfies_inequalities()
 
 
 def test_inequality_satisfaction():
     """
     The perimetric coordinates must always satisfy the inequalities given in
     equation (32) of the paper. Check if this works by generating four points
-    at random, converting them to perimetric coordinates, and checking if they
-    satisfy the inequalities.
+    at random, converting them to perimetric coordinates. The success of the
+    construction of a PerimetricCoordinate instance implies the satisfaction
+    of the inequalities.
 
     The points will all lie within a cube.
     """
@@ -125,8 +125,6 @@ def test_inequality_satisfaction():
         cartesians = CartesianCoordinate(p0, p1, p2, p3)
         pairdists = cartesian_to_pairdistance(cartesians)
         perimetrics = pairdistance_to_perimetric(pairdists)
-
-        assert perimetrics.satisfies_inequalities()
 
 
 def test_pairdistance_to_perimetric_and_back():
@@ -145,11 +143,13 @@ def test_pairdistance_to_perimetric_and_back():
         p3 = random_point_in_positive_octant_box(cube_sidelen)
 
         cartesians = CartesianCoordinate(p0, p1, p2, p3)
-        pairdists = cartesian_to_pairdistance(cartesians)
-        perimetrics = pairdistance_to_perimetric(pairdists)
-        pairdists_again = perimetric_to_pairdistance(perimetrics)
+        original_pairdists = cartesian_to_pairdistance(cartesians)
+        original_perimetrics = pairdistance_to_perimetric(original_pairdists)
+        recovered_pairdists = perimetric_to_pairdistance(original_perimetrics)
+        recovered_perimetrics = pairdistance_to_perimetric(recovered_pairdists)
 
-        assert distance_squared_between_pairdists(pairdists, pairdists_again) < tolerance
+        assert distance_squared_between_pairdists(original_pairdists, recovered_pairdists) < tolerance
+        assert perimetric_coordinate.approx_eq(original_perimetrics, recovered_perimetrics)
 
 
 def test_cartesian_to_pairdistance_and_back():

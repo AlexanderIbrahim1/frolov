@@ -15,14 +15,6 @@ in the case where u2 == u3.
 from dataclasses import dataclass
 from typing import Tuple
 
-from frolov.coordinates import PerimetricCoordinate
-
-
-# TODO
-# - a function to generate the grid coordinates, given some information about
-#   how the grid is structured; i.e. the maximum of grid_u1, the number of
-#   divisions of each coordinate, etc.
-
 
 @dataclass(frozen=True)
 class GridCoordinate:
@@ -34,7 +26,7 @@ class GridCoordinate:
     grid_w3: float
 
     def __post_init__(self) -> None:
-        assert self.satisfies_grid_constraints()
+        assert self._satisfies_grid_constraints()
 
     def unpack(self) -> Tuple[float, ...]:
         return (
@@ -46,7 +38,7 @@ class GridCoordinate:
             self.grid_w3,
         )
 
-    def satisfies_grid_constraints(self) -> bool:
+    def _satisfies_grid_constraints(self) -> bool:
         return all(
             [
                 self.grid_u1 >= 0,
@@ -57,37 +49,3 @@ class GridCoordinate:
                 1 >= self.grid_w3 >= 0,
             ]
         )
-
-
-def grid_to_perimetric(gridcoord: GridCoordinate)-> PerimetricCoordinate:
-    """Perform the transformations that turn a grid coordinate into a perimetric coordinate."""
-    grid_u1, grid_u2, grid_u3, grid_t3, grid_s3, grid_w3 = gridcoord.unpack()
-
-    u1 = grid_u1
-    u2 = grid_u2
-    s3 = grid_s3 * u2
-    u3 = grid_u3 * s3
-    t3 = grid_t3 * u3
-    w3 = grid_w3 * (u1 + u2) + (s3 - u2)
-
-    return PerimetricCoordinate(u1, u2, u3, t3, s3, w3)
-
-
-def perimetric_to_grid(perimetric: PerimetricCoordinate) -> GridCoordinate:
-    """Perform the inverse transformations of 'grid_to_perimetric()' """
-    u1, u2, u3, t3, s3, w3 = perimetric.unpack()
-
-    grid_u1 = u1
-    grid_u2 = u2
-    grid_s3 = s3 / u2
-    grid_u3 = u3 / s3
-    grid_t3 = t3 / u3
-    grid_w3 = (w3 - s3 + u2) / (u1 + u2)
-
-    return GridCoordinate(grid_u1, grid_u2, grid_u3, grid_t3, grid_s3, grid_w3)
-
-
-
-
-
-
