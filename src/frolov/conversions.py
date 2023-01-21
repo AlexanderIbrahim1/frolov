@@ -5,7 +5,7 @@ from cartesian.measure import euclidean_distance
 
 from frolov.coordinates.cartesian_coordinate import CartesianCoordinate
 from frolov.coordinates.grid_coordinate import GridCoordinate
-from frolov.coordinates.pair_distance_coordinate import PairDistanceCoordinate
+from frolov.coordinates.pairdistance_coordinate import PairDistanceCoordinate
 from frolov.coordinates.perimetric_coordinate import PerimetricCoordinate
 
 
